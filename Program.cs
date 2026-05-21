@@ -1413,6 +1413,29 @@ namespace LINQ
             {
                 Console.WriteLine($"   Color: {c.Color}, Size: {c.Size}");
             }
+
+            //81. (EF Core Translation) Given a LINQ query using a custom C# method inside Where.	
+            //Explain why it may fail in EF Core and rewrite it using translatable expressions.	Correct EF-safe query
+            Console.WriteLine("81. EF Core Translation");
+            bool CustomMethod(string name) => name.StartsWith("P");
+            var efBad = products.Where(x => CustomMethod(x.Name));   // Bad in EF Core
+            var efSafe = products.Where(x => x.Name.StartsWith("P"));// Good in EF Core
+
+            foreach (var item in efSafe)
+                Console.WriteLine($"    Product Name: {item.Name}");
+
+
+            //82. (N+1 Avoidance) Given customers and orders in EF Core.	
+            //Write a query / projection that avoids N + 1 queries while returning order counts.	
+            //Single efficient projection
+            Console.WriteLine("82. Avoids N + 1 queries while returning order counts");
+            var custOrdersCount = customers.Select(c => new
+            {
+                c.Name,
+                OrderCount = customerOrderList.Count(o => o.CustomerId == c.Id)
+            });
+            foreach (var item in custOrdersCount)
+                Console.WriteLine($"    Customer Name: {item.Name}, Orders Count: {item.OrderCount}");
         }
     }
 }
